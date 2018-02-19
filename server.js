@@ -24,8 +24,45 @@ var bot_responses = [
   "I dozed off, but I'm awake now!"
 ];
 
-function random_from_array(arr){
-  return arr[Math.floor(Math.random()*arr.length)]; 
+var data = [
+  //[Name, Contribution, Twitter handle, political opponent, opponent handle]
+  //From https://www.nytimes.com/interactive/2017/10/04/opinion/thoughts-prayers-nra-funding-senators.html
+  //Sens
+  ["John McCain", "$7,740,520", ''],
+  ["Richard Burr", "$6,986,620", ''],
+  ['Roy Blunt', '4,551,146', ''],
+  ['Thom Tillis', '4,418,012', ''],
+  ['Cory Gardner', '3,879,064', ''],
+  ['Marco Rubio', '3,303,355', ''],
+  ['Joni Ernst', '3,124,273', ''],
+  ['Rob Portman', '3,061,941', ''],
+  ['Todd Young', '2,896,732', ''],
+  ['Bill Cassidy', '2,861,047', ''],
+  //Reps
+  ['French Hill', '1,089,477', ''],
+  ['Ken Buck', '800,544', ''],
+  ['David Young', '707,662', ''],
+  ['Mike Simpson', '385,731', ''],
+  ['Greg Gianforte', '344,630', ''],
+  ['Don Young', '245,720', ''],
+  ['Lloyd Smucker', '221,736', ''],
+  ['Bruce Poliquin', '201,398', ''],
+  ['Pete Sessions', '158,111', ''],
+  ['Barbara Comstock', '137,232', ''],
+];
+
+// Returns an index into the politician table
+function parse_for_politician(text) {
+  return 0;
+}
+
+function get_response(event){
+  console.log(event.text);
+  
+  var poli = parse_for_politician(event.text);
+  var res = 'The NRA contributed ' + data[poli][1] + ' to ' + data[poli][0] + ' ' + data[poli][2] + ' (according to opensecrets.org).';
+  
+  return res; 
 }
 
 app.use(express.static('public'));
@@ -46,10 +83,12 @@ app.all("/tweet", function (request, response) {
           console.log(status.id_str);
           console.log(status.text);
           console.log(status.user.screen_name);
+          
+          var text = get_response(status);
 
           /* Now we can respond to each tweet. */
           T.post('statuses/update', {
-            status: '@' + status.user.screen_name + ' ' + random_from_array(bot_responses),
+            status: '@' + status.user.screen_name + ' ' + text,
             in_reply_to_status_id: status.id_str
           }, function(err, data, response) {
             if (err){
@@ -84,11 +123,13 @@ app.all("/tweet", function (request, response) {
           console.log(dm.sender_id);
           console.log(dm.id_str);
           console.log(dm.text);
+          
+          response = get_response(dm);
 
           /* Now we can respond to each tweet. */
           T.post('direct_messages/new', {
             user_id: dm.sender_id,
-            text: random_from_array(bot_responses)
+            text: response
           }, function(err, data, response) {
             if (err){
               /* TODO: Proper error handling? */
