@@ -140,7 +140,8 @@ app.all("/tweet", function (request, response) {
     /* First, let's load the ID of the last tweet we responded to. */
     console.log('last_mention_id:', last_mention_id);
 
-    T.get('search/tweets', { q: 'to:' + process.env.TWITTER_HANDLE + ' -from:' + process.env.TWITTER_HANDLE, since_id: last_mention_id }, function(err, data, response) {
+    T.get('search/tweets', { q: '%40' + process.env.TWITTER_HANDLE + ' -from:' + process.env.TWITTER_HANDLE, since_id: last_mention_id }, function(err, data, response) {
+    //T.get('search/tweets', { q: 'to:' + process.env.TWITTER_HANDLE + ' -from:' + process.env.TWITTER_HANDLE, since_id: last_mention_id }, function(err, data, response) {
       /* Next, let's search for Tweets that mention our bot, starting after the last mention we responded to. */
       if (data.statuses.length){
         // console.log(data.statuses);
